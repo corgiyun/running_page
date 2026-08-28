@@ -25,6 +25,7 @@ tzlocal
 fit-tool
 garmin-fit-sdk
 haversine==2.8.0
-garth
+garminconnect==0.3.11
+curl_cffi>=0.15.0
 pycryptodome
 duckdb

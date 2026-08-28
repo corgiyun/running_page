@@ -6,9 +6,9 @@
 4. 2023.09.26 garmin need secret_string(and in Actions) get
 
 ```bash
-  python run_page/get_garmin_secret.py ${email} ${password}
+  python run_page/get_garmin_secret.py ${email}
   # if cn
-  python run_page/get_garmin_secret.py ${email} ${password} --is-cn
+  python run_page/get_garmin_secret.py ${email} --is-cn
 ```
 
 ![running_page](https://socialify.git.ci/yihong0618/running_page/image?description=1&font=Inter&forks=1&issues=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fshaonianche%2Fgallery%2Fmaster%2Frunning_page%2Frunning_page_logo_150*150.jpg&owner=1&pulls=1&stargazers=1&theme=Light)
@@ -169,7 +169,7 @@ R.I.P. 希望大家都能健康顺利的跑过终点，逝者安息。
 git clone https://github.com/yihong0618/running_page.git --depth=1
 ```
 
-## 安装及测试 (node >= 20 python >= 3.11)
+## 安装及测试 (node >= 20 python >= 3.12)
 
 ```bash
 pip3 install -r requirements.txt
@@ -550,7 +550,7 @@ python3(python) run_page/tulipsport_sync.py nLgy****RyahI
 
 - 如果你想同步 `fit` 格式，增加命令 --fit
 
-- 如果你使用 Garmin 作为数据源建议您将代码拉取到本地获取 Garmin 国际区的密钥，注意**Python 版本必须>=3.8**
+- 如果你使用 Garmin 作为数据源建议您将代码拉取到本地获取 Garmin 国际区的 token，注意**Python 版本必须>=3.12**
 
 #### 获取佳明国际区的密钥
 
@@ -558,7 +558,7 @@ python3(python) run_page/tulipsport_sync.py nLgy****RyahI
 
 ```bash
 # 获取密钥
-python3(python) run_page/get_garmin_secret.py ${your email} ${your password}
+python3 run_page/get_garmin_secret.py ${your email}
 ```
 
 #### 执行佳明国际区同步脚本
@@ -583,22 +583,22 @@ python3(python) run_page/garmin_sync.py xxxxxxxxxxx
 - 如果你只想同步跑步数据请增加 --only-run
 - 如果你想同步 `tcx` 格式，增加命令 --tcx
 - 如果你想同步 `fit` 格式，增加命令 --fit
-- 如果你使用 Garmin 作为数据源建议您将代码拉取到本地获取 Garmin 国际区的密钥，注意**Python 版本必须>=3.10**
+- 如果你使用 Garmin 作为数据源建议您将代码拉取到本地获取 Garmin CN 的 token，注意**Python 版本必须>=3.12**
 
-#### 获取佳明 CN 的密钥
+#### 获取佳明 CN 的 token
 
 在终端中输入以下命令
 
 ```bash
-# to get secret_string
-python3(python) run_page/get_garmin_secret.py ${your email} ${your password} --is-cn
+# 获取 token（密码和 MFA 验证码会在终端交互输入）
+python3 run_page/get_garmin_secret.py ${your email} --is-cn
 ```
 
 ![get_garmin_cn_secret](docs/get_garmin_cn_secret.jpg)
 
 #### 执行佳明国区同步脚本
 
-复制上述终端中输出的密钥，如果您是使用 Github 请在 Github Action 中配置**GARMIN_SECRET_STRING_CN** 参数
+复制上述终端中输出的 JSON token，如果您是使用 Github 请在 Github Action 中配置**GARMIN_SECRET_STRING_CN** 参数。不要把密码提交到仓库。
 ![get_garmin_secret](docs/add_garmin_secret_cn_string.jpg)
 示例：
 
@@ -622,14 +622,14 @@ python3(python) run_page/garmin_sync.py xxxxxxxxxx --is-cn --only-run
 <br>
 
 - 如果你只想同步 `type running` 使用参数 --only-run
-**The Python version must be >=3.10**
+**The Python version must be >=3.12**
 
 #### 获取佳明 CN 的密钥
 
 在终端中输入以下命令
 
 ```bash
-python3(python) run_page/get_garmin_secret.py ${your email} ${your password} --is-cn
+python3 run_page/get_garmin_secret.py ${your email} --is-cn
 ```
 
 #### 获取佳明全球的密钥
@@ -637,7 +637,7 @@ python3(python) run_page/get_garmin_secret.py ${your email} ${your password} --i
 在终端中输入以下命令
 
 ```bash
-python3(python) run_page/get_garmin_secret.py ${your email} ${your password}
+python3 run_page/get_garmin_secret.py ${your email}
 ```
 
 #### 同步 佳明 CN 到 佳明全球

@@ -87,6 +87,31 @@ def update_or_create_activity(session, run_activity):
         activity = (
             session.query(Activity).filter_by(run_id=int(run_activity.id)).first()
         )
+        # Different providers use different IDs for the same workout. Garmin
+        # file imports use the start timestamp while Strava uses its own
+        # activity ID, so match an equivalent activity before inserting a new
+        # row. Requiring the same local second, type, and a close distance
+        # keeps this conservative for separate workouts.
+        if not activity:
+            candidates = (
+                session.query(Activity)
+                .filter(
+                    Activity.start_date_local == run_activity.start_date_local,
+                    Activity.type == run_activity.type,
+                )
+                .all()
+            )
+            run_distance = float(run_activity.distance or 0)
+            tolerance = max(30.0, abs(run_distance) * 0.01)
+            activity = next(
+                (
+                    candidate
+                    for candidate in candidates
+                    if candidate.distance is not None
+                    and abs(float(candidate.distance) - run_distance) <= tolerance
+                ),
+                None,
+            )
         if not activity:
             start_point = run_activity.start_latlng
             location_country = getattr(run_activity, "location_country", "")

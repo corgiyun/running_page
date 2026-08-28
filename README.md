@@ -6,9 +6,9 @@
 4. 2023.09.26 garmin need secret_string(and in Actions) get
 
 ```bash
-  python run_page/get_garmin_secret.py ${email} ${password}
+  python run_page/get_garmin_secret.py ${email}
   # if cn
-  python run_page/get_garmin_secret.py ${email} ${password} --is-cn
+  python run_page/get_garmin_secret.py ${email} --is-cn
 ```
 
 <p align="center">
@@ -152,7 +152,7 @@ Clone or fork the repo.
 git clone https://github.com/yihong0618/running_page.git --depth=1
 ```
 
-## Installation and testing (node >= 20 python >= 3.11)
+## Installation and testing (node >= 20 python >= 3.12)
 
 ```bash
 pip3 install -r requirements.txt
@@ -329,15 +329,15 @@ python3(python) run_page/fit_sync.py
 - If you only want `tcx` files add args --tcx
 - If you only want `fit` files add args --fit
 - If you are using Garmin as a data source, it is recommended that you pull the code to your local environment to run and obtain the Garmin secret.
-  **The Python version must be >=3.8**
+  **The Python version must be >=3.12**
 
 #### Get Garmin Secret
 
 Enter the following command in the terminal
 
 ```bash
-# to get secret_string
-python3(python) run_page/get_garmin_secret.py ${your email} ${your password}
+# to get token (the password and MFA code are entered interactively)
+python3 run_page/get_garmin_secret.py ${your email}
 ```
 
 #### Execute Garmin Sync Script
@@ -374,7 +374,7 @@ python3(python) run_page/garmin_sync.py xxxxxxxxxxxxxx(secret_string) --only-run
 - If you only want `tcx` files add args --tcx
 - If you only want `fit` files add args --fit
 - If you are using Garmin as a data source, it is recommended that you pull the code to your local environment to run and obtain the Garmin secret.
-  **The Python version must be >=3.10**
+  **The Python version must be >=3.12**
 
 #### Get Garmin CN Secret
 
@@ -382,14 +382,14 @@ Enter the following command in the terminal
 
 ```bash
 # to get secret_string
-python3(python) run_page/get_garmin_secret.py ${your email} ${your password} --is-cn
+python3 run_page/get_garmin_secret.py ${your email} --is-cn
 ```
 
 ![get_garmin_cn_secret](docs/get_garmin_cn_secret.jpg)
 
 #### Execute Garmin CN Sync Script
 
-Copy the Secret output in the terminal,If you are using Github, please configure **GARMIN_SECRET_STRING_CN** in Github Action.
+Copy the JSON token output in the terminal. If you are using Github, configure **GARMIN_SECRET_STRING_CN** in Github Actions. Do not commit your password or token to the repository.
 ![get_garmin_secret](docs/add_garmin_secret_cn_string.jpg)
 
 example：
@@ -414,7 +414,7 @@ python3(python) run_page/garmin_sync.py xxxxxxxxxxxxxx(secret_string)  --is-cn -
 <br>
 
 - If you only want to sync `type running` add args --only-run
-**The Python version must be >=3.10**
+**The Python version must be >=3.12**
 
 #### Get Garmin CN Secret
 
@@ -422,7 +422,7 @@ Enter the following command in the terminal
 
 ```bash
 # to get secret_string
-python3(python) run_page/get_garmin_secret.py ${your email} ${your password} --is-cn
+python3 run_page/get_garmin_secret.py ${your email} --is-cn
 ```
 
 #### Get Garmin Secret
@@ -431,7 +431,7 @@ Enter the following command in the terminal
 
 ```bash
 # to get secret_string
-python3(python) run_page/get_garmin_secret.py ${your email} ${your password}
+python3 run_page/get_garmin_secret.py ${your email}
 ```
 
 #### Sync Garmin CN to Garmin
