@@ -326,6 +326,7 @@ python3(python) run_page/fit_sync.py
 <br>
 
 - If you only want to sync `type running` add args --only-run
+- The GitHub Action is configured to sync only running activities from approximately the last two months (`--only-run --since-days 62`)
 - If you only want `tcx` files add args --tcx
 - If you only want `fit` files add args --fit
 - If you are using Garmin as a data source, it is recommended that you pull the code to your local environment to run and obtain the Garmin secret.

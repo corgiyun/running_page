@@ -581,6 +581,7 @@ python3(python) run_page/garmin_sync.py xxxxxxxxxxx
 <br>
 
 - 如果你只想同步跑步数据请增加 --only-run
+- 当前 GitHub Action 配置为只同步最近约两个月的跑步数据（`--only-run --since-days 62`）
 - 如果你想同步 `tcx` 格式，增加命令 --tcx
 - 如果你想同步 `fit` 格式，增加命令 --fit
 - 如果你使用 Garmin 作为数据源建议您将代码拉取到本地获取 Garmin CN 的 token，注意**Python 版本必须>=3.12**

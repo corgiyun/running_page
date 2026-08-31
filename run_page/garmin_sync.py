@@ -8,6 +8,7 @@ calls to the maintained ``garminconnect`` client.
 
 import argparse
 import asyncio
+from datetime import datetime, timedelta, timezone
 import os
 import sys
 import time
@@ -153,7 +154,20 @@ async def download_garmin_data(client, activity_id, file_type="gpx"):
         return False
 
 
-async def get_activity_id_list(client, start=0):
+def parse_activity_time(activity):
+    value = activity.get("startTimeGMT") or activity.get("startTimeLocal")
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+async def get_activity_id_list(client, start=0, since=None):
     activity_ids = []
     page_size = 100
     while True:
@@ -164,12 +178,21 @@ async def get_activity_id_list(client, start=0):
         if not activities:
             break
 
-        activity_ids.extend(
-            str(activity.get("activityId"))
-            for activity in activities
-            if activity.get("activityId") is not None
-        )
+        page_times = [parse_activity_time(activity) for activity in activities]
+        for activity, activity_time in zip(activities, page_times):
+            if activity.get("activityId") is None:
+                continue
+            if since is None or activity_time is None or activity_time >= since:
+                activity_ids.append(str(activity["activityId"]))
         print("Syncing Activity IDs")
+
+        # Garmin returns activities newest first. Once the oldest activity on a
+        # page is before the cutoff, later pages cannot contain a match.
+        valid_page_times = [
+            activity_time for activity_time in page_times if activity_time
+        ]
+        if since and valid_page_times and min(valid_page_times) < since:
+            break
         start += page_size
     return activity_ids
 
@@ -191,11 +214,17 @@ def get_downloaded_ids(folder):
 
 
 async def download_new_activities(
-    secret_string, auth_domain, downloaded_ids, is_only_running, folder, file_type
+    secret_string,
+    auth_domain,
+    downloaded_ids,
+    is_only_running,
+    folder,
+    file_type,
+    since=None,
 ):
     client = Garmin(secret_string, auth_domain, is_only_running)
     try:
-        activity_ids = await get_activity_id_list(client)
+        activity_ids = await get_activity_id_list(client, since=since)
         to_download = sorted(
             set(activity_ids) - set(downloaded_ids),
             key=lambda activity_id: int(activity_id),
@@ -239,6 +268,12 @@ if __name__ == "__main__":
         "--only-run", dest="only_run", action="store_true", help="only running"
     )
     parser.add_argument(
+        "--since-days",
+        type=int,
+        default=None,
+        help="only sync activities from the last N days",
+    )
+    parser.add_argument(
         "--tcx",
         dest="download_file_type",
         action="store_const",
@@ -258,11 +293,18 @@ if __name__ == "__main__":
     if options.secret_string is None:
         print("Missing Garmin token JSON")
         sys.exit(1)
+    if options.since_days is not None and options.since_days <= 0:
+        parser.error("--since-days must be a positive integer")
 
     auth_domain = (
         "CN" if options.is_cn else config("sync", "garmin", "authentication_domain")
     )
     file_type = options.download_file_type
+    since = (
+        datetime.now(timezone.utc) - timedelta(days=options.since_days)
+        if options.since_days
+        else None
+    )
     folder = FOLDER_DICT.get(file_type, FOLDER_DICT["gpx"])
     os.makedirs(folder, exist_ok=True)
     downloaded_ids = get_downloaded_ids(folder)
@@ -281,6 +323,7 @@ if __name__ == "__main__":
             options.only_run,
             folder,
             file_type,
+            since,
         )
     )
 
