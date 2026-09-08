@@ -22,9 +22,17 @@ def main():
         password=password,
         is_cn=options.is_cn,
         prompt_mfa=lambda: input("Garmin MFA code: ").strip(),
+        verify_login=False,
     )
     try:
-        client.login()
+        # Call the low-level credential flow so token generation does not fail
+        # on Garmin's optional social-profile bootstrap request. The generated
+        # token is used only by activity APIs in this project.
+        client.client.login(
+            email,
+            password,
+            prompt_mfa=client.prompt_mfa,
+        )
         # The token contains a refresh credential. Copy it only to GitHub
         # Secrets or another owner-only secure store.
         print(client.client.dumps())

@@ -36,7 +36,18 @@ class Garmin:
         self.is_cn = bool(auth_domain and str(auth_domain).upper() == "CN")
         self.is_only_running = is_only_running
         self.client = GarminConnectClient(is_cn=self.is_cn)
-        self.client.login(tokenstore=str(secret_string).strip())
+        self._load_token(str(secret_string).strip())
+
+    def _load_token(self, secret_string):
+        """Load a token without the optional profile bootstrap request.
+
+        ``Garmin.login(tokenstore=...)`` always calls the social-profile
+        endpoint after loading a token. Garmin currently returns 401 for that
+        endpoint for some accounts even though activity endpoints remain
+        usable. This adapter only needs activity APIs, so load the token at
+        the lower-level client and let its normal request path refresh it.
+        """
+        self.client.client.loads(secret_string)
 
     async def get_activities(self, start, limit):
         activity_type = "running" if self.is_only_running else None
