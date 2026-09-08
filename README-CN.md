@@ -597,6 +597,18 @@ python3 run_page/get_garmin_secret.py ${your email} --is-cn
 
 ![get_garmin_cn_secret](docs/get_garmin_cn_secret.jpg)
 
+#### 自动恢复失效 token
+
+`garmin_cn` Action 检测到 Garmin API 返回 401 时，会先尝试 refresh token；如果 refresh token 也失效，则使用账号密码重新登录，验证活动接口成功后自动更新 `GARMIN_SECRET_STRING_CN`，并在当前任务中重试一次。
+
+请在仓库 `Settings -> Secrets and variables -> Actions` 中额外配置：
+
+- `GARMIN_EMAIL`：Garmin CN 登录邮箱
+- `GARMIN_PASSWORD`：Garmin CN 登录密码
+- `GITHUB_SECRETS_WRITE_TOKEN`：一个仅限当前仓库、具有 `Secrets: write` 权限的 fine-grained GitHub token
+
+`GITHUB_SECRETS_WRITE_TOKEN` 只用于更新 GitHub Secret，不要把它写入代码或发送到聊天中。该自动恢复方案适用于不需要 MFA 的账号；如果 Garmin 账号启用了短信、邮件或动态验证码，仍需要人工处理验证码。
+
 #### 执行佳明国区同步脚本
 
 复制上述终端中输出的 JSON token，如果您是使用 Github 请在 Github Action 中配置**GARMIN_SECRET_STRING_CN** 参数。不要把密码提交到仓库。

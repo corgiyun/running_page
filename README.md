@@ -388,6 +388,18 @@ python3 run_page/get_garmin_secret.py ${your email} --is-cn
 
 ![get_garmin_cn_secret](docs/get_garmin_cn_secret.jpg)
 
+#### Automatic token recovery
+
+When the `garmin_cn` Action receives a Garmin API 401, it first tries the refresh token. If that also fails, it logs in with the configured credentials, validates the activity API, updates `GARMIN_SECRET_STRING_CN`, and retries once in the same job.
+
+Configure these additional repository Actions secrets under `Settings -> Secrets and variables -> Actions`:
+
+- `GARMIN_EMAIL`: Garmin CN login email
+- `GARMIN_PASSWORD`: Garmin CN login password
+- `GITHUB_SECRETS_WRITE_TOKEN`: a fine-grained GitHub token restricted to this repository with `Secrets: write` permission
+
+Keep `GITHUB_SECRETS_WRITE_TOKEN` out of the repository and chat. This unattended recovery is intended for accounts without MFA; SMS, email, or authenticator-code MFA still requires manual handling.
+
 #### Execute Garmin CN Sync Script
 
 Copy the JSON token output in the terminal. If you are using Github, configure **GARMIN_SECRET_STRING_CN** in Github Actions. Do not commit your password or token to the repository.

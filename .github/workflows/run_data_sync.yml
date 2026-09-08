@@ -13,6 +13,7 @@ on:
       - run_page/strava_sync.py
       - run_page/gen_svg.py
       - run_page/garmin_sync.py
+      - run_page/recover_garmin_token.py
       - run_page/coros_sync.py
       - run_page/keep_sync.py
       - run_page/gpx_sync.py
@@ -146,8 +147,51 @@ jobs:
         if: env.RUN_TYPE == 'garmin_cn'
         env:
           GARMIN_CN_TOKEN: ${{ secrets.GARMIN_SECRET_STRING_CN }}
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          # This must be a separate fine-grained token with repository
+          # Secrets: write permission. GITHUB_TOKEN cannot update secrets.
+          GH_TOKEN: ${{ secrets.GITHUB_SECRETS_WRITE_TOKEN }}
         run: |
-          # Generate CN token locally: python run_page/get_garmin_secret.py ${email} --is-cn
+          set +e
+          log_file="$(mktemp)"
+          token_file="$(mktemp)"
+          trap 'rm -f "$log_file" "$token_file"' EXIT
+          umask 077
+
+          python run_page/garmin_sync.py "$GARMIN_CN_TOKEN" --is-cn --only-run --since-days 62 2>&1 | tee "$log_file"
+          sync_status=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$sync_status" -eq 0 ]; then
+            exit 0
+          fi
+
+          # Only recover credentials for an authentication failure. A normal
+          # network or data error should keep the original failure visible.
+          if ! grep -q "401" "$log_file"; then
+            echo "Garmin sync failed without an API 401; token recovery skipped."
+            exit "$sync_status"
+          fi
+
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::Configure GITHUB_SECRETS_WRITE_TOKEN to enable automatic Garmin token recovery."
+            exit "$sync_status"
+          fi
+
+          python run_page/recover_garmin_token.py \
+            --is-cn \
+            --token-json "$GARMIN_CN_TOKEN" \
+            --email "$GARMIN_EMAIL" \
+            --output "$token_file" \
+            --non-interactive
+
+          # Persist both the access token and the rotated refresh token for
+          # future runs. The current job uses the file directly because Actions
+          # secrets are resolved when a job starts.
+          gh secret set GARMIN_SECRET_STRING_CN < "$token_file"
+          GARMIN_CN_TOKEN="$(< "$token_file")"
+          echo "Garmin token replaced; retrying the sync once."
           python run_page/garmin_sync.py "$GARMIN_CN_TOKEN" --is-cn --only-run --since-days 62
         # If you only want to sync `type running` add args --only-run, default script is to sync all data (rides and runs).
         # python run_page/garmin_sync.py ${{ secrets.GARMIN_SECRET_STRING_CN }}  --only-run --is-cn
