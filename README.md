@@ -396,9 +396,9 @@ Configure these additional repository Actions secrets under `Settings -> Secrets
 
 - `GARMIN_EMAIL`: Garmin CN login email
 - `GARMIN_PASSWORD`: Garmin CN login password
-- `GITHUB_SECRETS_WRITE_TOKEN`: a fine-grained GitHub token restricted to this repository with `Secrets: write` permission
+- `ACTIONS_SECRETS_WRITE_TOKEN`: a fine-grained GitHub token restricted to this repository with `Secrets: write` permission
 
-Keep `GITHUB_SECRETS_WRITE_TOKEN` out of the repository and chat. This unattended recovery is intended for accounts without MFA; SMS, email, or authenticator-code MFA still requires manual handling.
+Keep `ACTIONS_SECRETS_WRITE_TOKEN` out of the repository and chat. This unattended recovery is intended for accounts without MFA; SMS, email, or authenticator-code MFA still requires manual handling.
 
 #### Execute Garmin CN Sync Script
 

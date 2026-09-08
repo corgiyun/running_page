@@ -605,9 +605,9 @@ python3 run_page/get_garmin_secret.py ${your email} --is-cn
 
 - `GARMIN_EMAIL`：Garmin CN 登录邮箱
 - `GARMIN_PASSWORD`：Garmin CN 登录密码
-- `GITHUB_SECRETS_WRITE_TOKEN`：一个仅限当前仓库、具有 `Secrets: write` 权限的 fine-grained GitHub token
+- `ACTIONS_SECRETS_WRITE_TOKEN`：一个仅限当前仓库、具有 `Secrets: write` 权限的 fine-grained GitHub token
 
-`GITHUB_SECRETS_WRITE_TOKEN` 只用于更新 GitHub Secret，不要把它写入代码或发送到聊天中。该自动恢复方案适用于不需要 MFA 的账号；如果 Garmin 账号启用了短信、邮件或动态验证码，仍需要人工处理验证码。
+`ACTIONS_SECRETS_WRITE_TOKEN` 只用于更新 GitHub Secret，不要把它写入代码或发送到聊天中。该自动恢复方案适用于不需要 MFA 的账号；如果 Garmin 账号启用了短信、邮件或动态验证码，仍需要人工处理验证码。
 
 #### 执行佳明国区同步脚本
 

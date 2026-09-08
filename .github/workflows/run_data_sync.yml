@@ -151,7 +151,7 @@ jobs:
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
           # This must be a separate fine-grained token with repository
           # Secrets: write permission. GITHUB_TOKEN cannot update secrets.
-          GH_TOKEN: ${{ secrets.GITHUB_SECRETS_WRITE_TOKEN }}
+          GH_TOKEN: ${{ secrets.ACTIONS_SECRETS_WRITE_TOKEN }}
         run: |
           set +e
           log_file="$(mktemp)"
@@ -175,7 +175,7 @@ jobs:
           fi
 
           if [ -z "${GH_TOKEN:-}" ]; then
-            echo "::error::Configure GITHUB_SECRETS_WRITE_TOKEN to enable automatic Garmin token recovery."
+            echo "::error::Configure ACTIONS_SECRETS_WRITE_TOKEN to enable automatic Garmin token recovery."
             exit "$sync_status"
           fi
 
